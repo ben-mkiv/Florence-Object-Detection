@@ -7,7 +7,7 @@ This Flask application provides a web interface and API endpoints for generating
 The application is desined to run on Mac M1 but can run on any machine CPU and will use CUDA GPU when available.
 
 ## Features:
-* Upload images or provide image URLs to generate captions.
+* Upload images ~~or provide image URLs to generate captions.~~ (disabled in `index.html`)
 * Detect objects in images and draw bounding boxes around them.
 * API endpoints for generating captions from image URLs or uploaded image files.
 
