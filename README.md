@@ -1,10 +1,10 @@
 # Object Detection Web Application
 Image Captioning in Python Web using a Flask App.
 
-This Flask application provides a web interface and API endpoints for generating image captions and detecting objects in images using a pre-trained model - Florence-2-large from HaggingFaces.
+This Flask application provides a web interface and API endpoints for generating image captions and detecting objects in images using a pre-trained model - Florence-2-large from [HuggingFace](https://huggingface.co/microsoft/Florence-2-large).
 
 ### Note
-The application is desined to run on Mac M1 but can run on any machine GPU.
+The application is desined to run on Mac M1 but can run on any machine CPU and will use CUDA GPU when available.
 
 ## Features:
 * Upload images or provide image URLs to generate captions.
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ## Run the Application
 python Florence-2-large-Object-Detection.py
-The application will be available at http://127.0.0.1:5000
+The application will be available at http://127.0.0.1:5000 and http://0.0.0.0:5000
 
 ## API Endpoints
 ### Generate Caption from URL
@@ -46,9 +46,9 @@ Response:
 You can run the test.py script to test the server is working properly.
 
 ## Web Interface
-Access the web interface at http://127.0.0.1:5000/.
-Upload an image or provide an image URL.
-Enter a text prompt (supports only the "<MORE_DETAILED_CAPTION>" prompt at the moment) and click "Generate Caption" to get the generated caption and see the image with bounding boxes for detected objects.
+Access the web interface at http://0.0.0.0:5000/.
+Upload an image.
+~~Enter a text prompt (supports only the "<MORE_DETAILED_CAPTION>" prompt at the moment) and click "Generate Caption" to get the generated caption and see the image with bounding boxes for detected objects.~~ this field is auto-populated and can be reenabled in the `index.html` file
 
 ### index.html
 The index.html contain the UI.
@@ -60,6 +60,9 @@ Logging is configured to capture detailed information about the application's op
 * Ensure all dependencies are installed correctly.
 * Verify that the image URLs provided are accessible and correct.
 * Check the application logs for detailed error messages.
+
+## additional Troubleshooting notes
+* it seems like the model is picky about the input resolution (or aspect ratio, try with some basic 4:3 or 16:9 image to ensure that the model works)
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
