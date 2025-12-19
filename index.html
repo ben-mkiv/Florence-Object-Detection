@@ -37,7 +37,7 @@
     <div class="container">
       <h1 class="text-center">Image Captioning Web App</h1>
       <form method="post" enctype="multipart/form-data">
-        <div class="mb-3">
+        <div class="mb-3" style="display: none;">
           <label for="image_url" class="form-label">Image URL</label>
           <input type="text" class="form-control" id="image_url" name="image_url" placeholder="Enter the URL of the image">
         </div>
@@ -45,12 +45,12 @@
           <label for="image_file" class="form-label">Upload Image</label>
           <input type="file" class="form-control" id="image_file" name="image_file">
         </div>
-        <div class="mb-3">
+        <div class="mb-3" style="display: none;">
           <label for="prompt" class="form-label">Prompt</label>
-          <input type="text" class="form-control" id="prompt" name="prompt" placeholder="Enter your prompt" required>
+          <input type="text" class="form-control" id="prompt" name="prompt" placeholder="Enter your prompt" required value="<MORE_DETAILED_CAPTION>">
         </div>
         <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="get_box_objects" name="get_box_objects">
+            <input type="checkbox" class="form-check-input" id="get_box_objects" name="get_box_objects" checked>
             <label class="form-check-label" for="get_box_objects">Get Box Objects</label>
         </div>
         <button type="submit" class="btn btn-primary w-100">Generate Caption</button>
