@@ -11,6 +11,7 @@ import logging
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib
+import torch
 matplotlib.use('Agg')  # Use a non-GUI backend
 
 app = Flask(__name__)
@@ -23,31 +24,43 @@ UPLOAD_FOLDER = os.path.join(script_dir, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+seed = 6912542
+torch.manual_seed(seed)
+
 # Fix for importing modules in Florence-2 model
 def fixed_get_imports(filename: Union[str, os.PathLike]) -> List[str]:
     """Work around for https://huggingface.co/microsoft/phi-1_5/discussions/72."""
     if not str(filename).endswith("/modeling_florence2.py"):
         return get_imports(filename)
     imports = get_imports(filename)
-    imports.remove("flash_attn")
+    if "flash_attn" in imports:
+        imports.remove("flash_attn")
     return imports
 
 # Apply the patch to fix imports
 with patch("transformers.dynamic_module_utils.get_imports", fixed_get_imports):
-    model = AutoModelForCausalLM.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True).to(device)
     processor = AutoProcessor.from_pretrained("microsoft/Florence-2-large-ft", trust_remote_code=True)
 
 # Function to run the model and process the image and prompt
 def run_example(prompt, image):
-    inputs = processor(text=prompt, images=image, return_tensors="pt")
+    inputs = processor(text=prompt, images=image, return_tensors="pt").to(device)
     generated_ids = model.generate(
         input_ids=inputs["input_ids"],
         pixel_values=inputs["pixel_values"],
-        max_new_tokens=2048,
+        max_new_tokens=1024,
         num_beams=3,
+        return_dict_in_generate=True,
+        output_scores=True,
     )
-    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
+    generated_text = processor.batch_decode(generated_ids.sequences.cpu(), skip_special_tokens=False)[0]
     parsed_answer = processor.post_process_generation(generated_text, task=prompt, image_size=(image.width, image.height))
+
+    #todo: add scores to the result
+    #print(generated_ids.scores)
+    
     return parsed_answer
 
 @app.route('/', methods=['GET', 'POST'])
@@ -168,4 +181,4 @@ def plot_bbox(image, data):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
